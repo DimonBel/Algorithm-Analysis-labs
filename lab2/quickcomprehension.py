@@ -30,7 +30,14 @@ for size in sizes:
     times.append(exec_time)
 
 plt.figure(figsize=(10, 5))
-plt.plot(sizes, times, marker="o", linestyle="-", color="b", label="Quicksort Time")
+plt.plot(
+    sizes,
+    times,
+    marker="o",
+    linestyle="-",
+    color="b",
+    label="Quicksort Time with Comprehension",
+)
 plt.xlabel("Array Size")
 plt.ylabel("Execution Time (seconds)")
 plt.title("Quicksort Execution Time vs Array Size")

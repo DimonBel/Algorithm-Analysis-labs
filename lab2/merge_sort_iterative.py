@@ -50,7 +50,14 @@ for size in sizes:
     times.append(exec_time)
 
 plt.figure(figsize=(10, 5))
-plt.plot(sizes, times, marker="o", linestyle="-", color="b", label="MergeSort Time")
+plt.plot(
+    sizes,
+    times,
+    marker="o",
+    linestyle="-",
+    color="b",
+    label="MergeSort Time with iterative MergeSort",
+)
 plt.xlabel("Array Size")
 plt.ylabel("Execution Time (seconds)")
 plt.title("MergeSort Execution Time vs Array Size")
