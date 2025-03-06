@@ -2,8 +2,79 @@ import matplotlib.pyplot as plt
 import numpy as np
 from random import randint
 from timeit import repeat
+import math
+from heapq import heappush, heappop
 
 
+# Introsort implementation
+def heapsort(arr):
+    h = []
+    for value in arr:
+        heappush(h, value)
+    arr.clear()
+    arr.extend([heappop(h) for _ in range(len(h))])
+
+
+def InsertionSort(arr, begin, end):
+    for i in range(begin + 1, end + 1):
+        key = arr[i]
+        j = i - 1
+        while j >= begin and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+
+
+def Partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
+
+
+def MedianOfThree(arr, a, b, d):
+    A = arr[a]
+    B = arr[b]
+    C = arr[d]
+    if A <= B <= C:
+        return b
+    if C <= B <= A:
+        return b
+    if B <= A <= C:
+        return a
+    if C <= A <= B:
+        return a
+    if B <= C <= A:
+        return d
+    if A <= C <= B:
+        return d
+
+
+def IntrosortUtil(arr, begin, end, depthLimit):
+    size = end - begin
+    if size < 16:
+        InsertionSort(arr, begin, end)
+        return
+    if depthLimit == 0:
+        heapsort(arr)
+        return
+    pivot = MedianOfThree(arr, begin, begin + size // 2, end)
+    arr[pivot], arr[end] = arr[end], arr[pivot]
+    partitionPoint = Partition(arr, begin, end)
+    IntrosortUtil(arr, begin, partitionPoint - 1, depthLimit - 1)
+    IntrosortUtil(arr, partitionPoint + 1, end, depthLimit - 1)
+
+
+def Introsort(arr, begin, end):
+    depthLimit = 2 * math.floor(math.log2(end - begin))
+    IntrosortUtil(arr, begin, end, depthLimit)
+
+
+# Existing sorting algorithms
 def partition(array, low, high):
     pivot = array[high]
     i = low - 1
@@ -87,25 +158,25 @@ def heap_sort(arr):
         heapify(arr, i, 0)
 
 
-def measure_time(algorithm, array):
-    stmt = lambda: globals()[algorithm](array.copy())
+# Function to measure execution time
+def measure_time(algorithm, array, *args):
+    stmt = lambda: globals()[algorithm](array.copy(), *args)
     times = repeat(stmt, repeat=3, number=10)
     return min(times)
 
 
-sizes = [100, 200, 500, 1000, 5000, 10000, 20000, 50000]
-sorting_algorithms = [
-    "quickSort",
-    "merge",
-    "pigeonhole_sort",
-    "heap_sort",
-]
+# Main code to compare sorting algorithms
+sizes = [100, 200, 500, 1000, 5000, 10000, 20000]
+sorting_algorithms = ["quickSort", "merge", "pigeonhole_sort", "heap_sort", "Introsort"]
 times = {algo: [] for algo in sorting_algorithms}
 
 for size in sizes:
     array = [randint(0, 1000) for _ in range(size)]
     for algo in sorting_algorithms:
-        exec_time = measure_time(algo, array.copy())
+        if algo == "Introsort":
+            exec_time = measure_time(algo, array.copy(), 0, len(array) - 1)
+        else:
+            exec_time = measure_time(algo, array.copy())
         times[algo].append(exec_time)
 
 plt.figure(figsize=(10, 5))
